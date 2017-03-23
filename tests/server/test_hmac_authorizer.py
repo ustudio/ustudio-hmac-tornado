@@ -11,7 +11,7 @@ class TestHMACAuthorizer(BaseHMACTestCase):
 
         return hmac.new(
             secret.encode("utf-8"),
-            "".join((method, path)).encode("utf-8") + body,
+            "\n".join((method, path, "", "")).encode("utf-8") + body,
             hashlib.sha256).hexdigest()
 
     def test_request_raises_if_request_does_not_have_authorization_header(self):
