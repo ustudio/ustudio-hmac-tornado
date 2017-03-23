@@ -6,7 +6,7 @@ from hmacauth.server import hmac_authorized
 
 class AuthorizedRoute(RequestHandler):
     @hmac_authorized
-    def get(self, arg):
+    async def get(self, arg):
         self.finish(self.request.headers.get("X-Ping", ""))
 
     @hmac_authorized

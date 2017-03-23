@@ -32,6 +32,6 @@ def hmac_authorized(method):
             logging.info("Invalid HMAC digest {}".format(provided_digest))
             raise HTTPError(401)
 
-        method(handler, *args, **kwargs)
+        return method(handler, *args, **kwargs)
 
     return hmac_authorized_wrapper
