@@ -61,7 +61,7 @@ class TestAuthenticatedRequest(BaseHMACTestCase):
         self.assertEqual(200, response.code)
 
     @gen_test
-    async def test_signs_includes_existing_headers(self):
+    async def test_includes_existing_headers_in_request(self):
         response = await self.http_client.fetch(authenticated_request(
             self.get_url("/authorized/argument"),
             headers={
