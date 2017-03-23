@@ -1,0 +1,1 @@
+from hmacauth.server.hmac_authorizer import hmac_authorized
