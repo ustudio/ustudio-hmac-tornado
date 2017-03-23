@@ -1,31 +1,10 @@
 import hmac
 import hashlib
 
-from tornado.testing import AsyncHTTPTestCase
-from tornado.web import RequestHandler, Application
-
-from hmacauth.server import hmac_authorized
+from tests.example_server import BaseHMACTestCase
 
 
-class AuthorizedRoute(RequestHandler):
-    @hmac_authorized
-    def get(self, arg):
-        pass
-
-    @hmac_authorized
-    def post(self, arg):
-        pass
-
-    def get_hmac_secret(self, key):
-        if key == "correct-key":
-            return "secret"
-        return None
-
-
-class TestHMACAuthorizer(AsyncHTTPTestCase):
-    def get_app(self):
-        return Application([(r"/authorized/(.*)", AuthorizedRoute)])
-
+class TestHMACAuthorizer(BaseHMACTestCase):
     def generate_digest(self, secret, method, path, body):
         if isinstance(body, str):
             body = body.encode("utf-8")
