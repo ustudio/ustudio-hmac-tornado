@@ -72,3 +72,12 @@ class TestAuthenticatedRequest(BaseHMACTestCase):
 
         self.assertEqual(200, response.code)
         self.assertEqual("Pong", response.body.decode("utf8"))
+
+    @gen_test
+    async def test_signs_url_as_keyword_argument(self):
+        response = await self.http_client.fetch(authenticated_request(
+            url=self.get_url("/authorized/argument"),
+            hmac_key="correct-key",
+            hmac_secret="secret"))
+
+        self.assertEqual(200, response.code)

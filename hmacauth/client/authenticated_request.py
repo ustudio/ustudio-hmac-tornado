@@ -9,7 +9,12 @@ def authenticated_request(*args, **kwargs):
     hmac_key = kwargs.pop("hmac_key")
     hmac_secret = kwargs.pop("hmac_secret")
 
-    path = urlparse(args[0]).path
+    if len(args) > 0:
+        url = args[0]
+    else:
+        url = kwargs["url"]
+
+    path = urlparse(url).path
 
     body = kwargs.get("body", "")
     if isinstance(body, str):
