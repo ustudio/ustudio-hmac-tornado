@@ -1,9 +1,8 @@
-import hmac
-import hashlib
-
 from tornado.httpclient import HTTPRequest
 
 from urllib.parse import urlparse
+
+from hmacauth.digest import generate_digest
 
 
 def authenticated_request(*args, **kwargs):
@@ -16,11 +15,7 @@ def authenticated_request(*args, **kwargs):
     if isinstance(body, str):
         body = body.encode("utf-8")
 
-    digest = hmac.new(
-        hmac_secret.encode("utf-8"),
-        "".join((kwargs.get("method", "GET"), path)).encode("utf-8") +
-        body,
-        hashlib.sha256).hexdigest()
+    digest = generate_digest(hmac_secret, kwargs.get("method", "GET"), path, body)
 
     headers = kwargs.get("headers", {})
     headers["Authorization"] = "USTUDIO-HMAC-V2 {} {}".format(hmac_key, digest)

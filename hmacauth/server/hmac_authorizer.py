@@ -1,9 +1,10 @@
 import hmac
-import hashlib
 import logging
 
 import functools
 from tornado.web import HTTPError
+
+from hmacauth.digest import generate_digest
 
 
 def hmac_authorized(method):
@@ -24,11 +25,8 @@ def hmac_authorized(method):
             logging.info("Invalid HMAC key {}".format(key))
             raise HTTPError(401)
 
-        expected_digest = hmac.new(
-            secret.encode("utf-8"),
-            "".join((handler.request.method, handler.request.path)).encode("utf-8") +
-            handler.request.body,
-            hashlib.sha256).hexdigest()
+        expected_digest = generate_digest(
+            secret, handler.request.method, handler.request.path, handler.request.body)
 
         if not hmac.compare_digest(expected_digest, provided_digest):
             logging.info("Invalid HMAC digest {}".format(provided_digest))
