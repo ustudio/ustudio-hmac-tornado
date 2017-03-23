@@ -14,7 +14,11 @@ def authenticated_request(*args, **kwargs):
     else:
         url = kwargs["url"]
 
-    path = urlparse(url).path
+    parsed_url = urlparse(url)
+    if len(parsed_url.query) > 0:
+        raise NotImplementedError("HMAC Authorized requests with query strings not yet supported")
+
+    path = parsed_url.path
 
     body = kwargs.get("body", "")
     if isinstance(body, str):

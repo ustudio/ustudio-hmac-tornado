@@ -83,6 +83,16 @@ class TestHMACAuthorizer(BaseHMACTestCase):
 
         self.assertEqual(401, response.code)
 
+    def test_request_raises_400_if_query_parameters_present(self):
+        digest = self.generate_digest("secret", "GET", "/authorized/argument", "")
+        response = self.fetch(
+            "/authorized/argument?params=not&yet=supported",
+            headers={
+                "Authorization": "WRONG-ALGORITHM correct-key {}".format(digest)
+            })
+
+        self.assertEqual(400, response.code)
+
     def test_get_succeeds_with_valid_hmac(self):
         digest = self.generate_digest("secret", "GET", "/authorized/argument", "")
         response = self.fetch(
