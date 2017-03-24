@@ -83,6 +83,13 @@ class TestAuthenticatedRequest(BaseHMACTestCase):
         self.assertEqual(200, response.code)
 
     @gen_test
+    async def test_raises_exception_without_url_argument(self):
+        with self.assertRaises(TypeError):
+            await self.http_client.fetch(authenticated_request(
+                hmac_key="correct-key",
+                hmac_secret="secret"))
+
+    @gen_test
     async def test_raises_exception_when_query_arguments_present(self):
         with self.assertRaises(NotImplementedError):
             await self.http_client.fetch(authenticated_request(

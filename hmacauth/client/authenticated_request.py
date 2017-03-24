@@ -11,8 +11,10 @@ def authenticated_request(*args, **kwargs):
 
     if len(args) > 0:
         url = args[0]
-    else:
+    elif "url" in kwargs:
         url = kwargs["url"]
+    else:
+        raise TypeError("Missing argument: 'url'")
 
     parsed_url = urlparse(url)
     if len(parsed_url.query) > 0:
