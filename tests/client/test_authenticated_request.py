@@ -90,9 +90,10 @@ class TestAuthenticatedRequest(BaseHMACTestCase):
                 hmac_secret="secret"))
 
     @gen_test
-    async def test_raises_exception_when_query_arguments_present(self):
-        with self.assertRaises(NotImplementedError):
-            await self.http_client.fetch(authenticated_request(
-                url=self.get_url("/authorized/argument?query=not&yet=supported"),
-                hmac_key="correct-key",
-                hmac_secret="secret"))
+    async def test_normalizes_and_signs_query_arguments(self):
+        response = await self.http_client.fetch(authenticated_request(
+            url=self.get_url("/authorized/argument?bar=value%202&Foo=value%3f1&blank"),
+            hmac_key="correct-key",
+            hmac_secret="secret"))
+
+        self.assertEqual(200, response.code)

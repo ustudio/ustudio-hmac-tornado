@@ -5,13 +5,13 @@ from tests.example_server import BaseHMACTestCase
 
 
 class TestHMACAuthorizer(BaseHMACTestCase):
-    def generate_digest(self, secret, method, path, body):
+    def generate_digest(self, secret, method, path, body, canonical_query=""):
         if isinstance(body, str):
             body = body.encode("utf-8")
 
         return hmac.new(
             secret.encode("utf-8"),
-            "\n".join((method, path, "", "")).encode("utf-8") + body,
+            "\n".join((method, path, canonical_query, "")).encode("utf-8") + body,
             hashlib.sha256).hexdigest()
 
     def test_request_raises_if_request_does_not_have_authorization_header(self):
@@ -83,15 +83,15 @@ class TestHMACAuthorizer(BaseHMACTestCase):
 
         self.assertEqual(401, response.code)
 
-    def test_request_raises_400_if_query_parameters_present(self):
-        digest = self.generate_digest("secret", "GET", "/authorized/argument", "")
+    def test_request_raises_401_if_query_parameters_differ(self):
+        digest = self.generate_digest("secret", "GET", "/authorized/argument", "different=params")
         response = self.fetch(
-            "/authorized/argument?params=not&yet=supported",
+            "/authorized/argument?params=value",
             headers={
-                "Authorization": "WRONG-ALGORITHM correct-key {}".format(digest)
+                "Authorization": "USTUDIO-HMAC-V2 correct-key {}".format(digest)
             })
 
-        self.assertEqual(400, response.code)
+        self.assertEqual(401, response.code)
 
     def test_get_succeeds_with_valid_hmac(self):
         digest = self.generate_digest("secret", "GET", "/authorized/argument", "")
@@ -112,5 +112,18 @@ class TestHMACAuthorizer(BaseHMACTestCase):
                 "Authorization": "USTUDIO-HMAC-V2 correct-key {}".format(digest)
             },
             body="Some Body")
+
+        self.assertEqual(200, response.code)
+
+    def test_get_succeeds_with_normalized_query_parameters(self):
+        digest = self.generate_digest(
+            "secret", "GET", "/authorized/argument", "",
+            canonical_query="Foo=value%3F1&bar=avalue&bar=value%202&blank=")
+
+        response = self.fetch(
+            "/authorized/argument?bar=value%202&bar=avalue&Foo=value%3f1&blank",
+            headers={
+                "Authorization": "USTUDIO-HMAC-V2 correct-key {}".format(digest)
+            })
 
         self.assertEqual(200, response.code)
