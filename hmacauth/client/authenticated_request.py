@@ -17,16 +17,15 @@ def authenticated_request(*args, **kwargs):
         raise TypeError("Missing argument: 'url'")
 
     parsed_url = urlparse(url)
-    if len(parsed_url.query) > 0:
-        raise NotImplementedError("HMAC Authorized requests with query strings not yet supported")
 
     path = parsed_url.path
+    query = parsed_url.query
 
     body = kwargs.get("body", "")
     if isinstance(body, str):
         body = body.encode("utf-8")
 
-    digest = generate_digest(hmac_secret, kwargs.get("method", "GET"), path, body)
+    digest = generate_digest(hmac_secret, kwargs.get("method", "GET"), path, query, body)
 
     headers = kwargs.get("headers", {})
     headers["Authorization"] = "USTUDIO-HMAC-V2 {} {}".format(hmac_key, digest)

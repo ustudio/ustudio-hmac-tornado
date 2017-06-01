@@ -10,10 +10,6 @@ from hmacauth.digest import generate_digest
 def hmac_authorized(method):
     @functools.wraps(method)
     def hmac_authorized_wrapper(handler, *args, **kwargs):
-        if len(handler.request.query) > 0:
-            logging.warning("Unsupported query arguments on HMAC authorized request")
-            raise HTTPError(400)
-
         authorization = handler.request.headers.get("Authorization", "").split(" ")
         if len(authorization) != 3:
             logging.info("Invalid Authorization header {}".format(authorization))
@@ -30,7 +26,8 @@ def hmac_authorized(method):
             raise HTTPError(401)
 
         expected_digest = generate_digest(
-            secret, handler.request.method, handler.request.path, handler.request.body)
+            secret, handler.request.method, handler.request.path, handler.request.query,
+            handler.request.body)
 
         if not hmac.compare_digest(expected_digest, provided_digest):
             logging.info("Invalid HMAC digest {}".format(provided_digest))
