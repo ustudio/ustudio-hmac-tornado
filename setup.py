@@ -9,7 +9,7 @@ install_requires = [
 ]
 
 setup(name="ustudio-hmac-tornado",
-      version="0.2.0",
+      version="0.3.0",
       description="Simple HMAC Client/Server authentication for Tornado",
       url="https://github.com/ustudio/ustudio-hmac-tornado",
       packages=find_packages(exclude=["tests", "dist"]),
