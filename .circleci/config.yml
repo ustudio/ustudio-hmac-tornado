@@ -1,0 +1,102 @@
+version: 2.1
+jobs:
+  test:
+    parameters:
+      python_version:
+        description: "The Python version to use for running the tests"
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python_version >>
+    steps:
+      - checkout
+
+      - run:
+          name: Save Python Version
+          command: |
+            python --version > pythonversion
+
+      - restore_cache:
+          keys:
+            - v1-python-{{ checksum "pythonversion" }}-dependencies-{{ checksum "dev-requirements.txt" }}
+
+      - run:
+          name: install dependencies
+          command: |
+            python -m virtualenv ~/venv
+            . ~/venv/bin/activate
+            pip install -e .
+            pip install -r requirements.txt
+            mkdir -p test-reports
+
+      - save_cache:
+          paths:
+            - ~/venv
+          key: v1-python-{{ checksum "pythonversion" }}-dependencies-{{ checksum "dev-requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . ~/venv/bin/activate
+            pytest --verbose --junit-xml=test-reports/pytest.xml
+
+      - store_artifacts:
+          path: test-reports
+          prefix: python-<< parameters.python_version >>
+
+      - store_test_results:
+          path: test-reports
+          prefix: python-<< parameters.python_version >>
+
+  publish:
+    docker:
+      - image: cimg/python:3.7
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python -m virtualenv ~/venv
+            . ~/venv/bin/activate
+            pip install twine
+
+      - run:
+          name: Publish to PyPI
+          command: |
+            . ~/venv/bin/activate
+            ./publish_to_pypi.sh
+
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - test:
+          name: test-3.7
+          python_version: "3.7"
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          name: test-3.8
+          python_version: "3.8"
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          name: test-3.9
+          python_version: "3.9"
+          filters:
+            tags:
+              only: /.*/
+      - publish:
+          requires:
+            - test-3.7
+            - test-3.8
+            - test-3.9
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*.*/
+            branches:
+              ignore: /.*/
+          context: ustudio-hmac-tornado-publisher
