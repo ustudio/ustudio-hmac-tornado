@@ -1,6 +1,6 @@
 [project]
 name = "ustudio-hmac-tornado"
-version = "0.3.0"
+version = "0.4.0"
 description = "Simple HMAC Client/Server authentication for Tornado"
 authors = [{name = "uStudio Developers", email = "dev@ustudio.com"}]
 license = "MIT"
