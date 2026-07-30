@@ -41,6 +41,11 @@ jobs:
           command: |
             poetry run pytest --verbose --junit-xml=test-reports/pytest.xml
 
+      - run:
+          name: run lint
+          command: |
+            poetry run flake8 | tee test-reports/flake8-errors
+
       - store_artifacts:
           path: test-reports
           prefix: python-<< parameters.python_version >>
