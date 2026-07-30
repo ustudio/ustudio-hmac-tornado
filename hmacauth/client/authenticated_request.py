@@ -1,9 +1,5 @@
 from tornado.httpclient import HTTPRequest
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 from hmacauth.digest import generate_digest
 

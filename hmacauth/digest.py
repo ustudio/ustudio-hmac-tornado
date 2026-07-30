@@ -1,11 +1,6 @@
 import hmac
 import hashlib
-
-try:
-    from urllib.parse import parse_qs, quote
-except ImportError:
-    from urlparse import parse_qs
-    from urllib import quote
+from urllib.parse import parse_qs, quote
 
 
 def generate_digest(secret, method, path, query, body):
@@ -19,6 +14,5 @@ def generate_digest(secret, method, path, query, body):
 
     return hmac.new(
         secret.encode("utf-8"),
-        "\n".join((method, path, "&".join(canonical_query), "")).encode("utf-8") +
-        body,
+        "\n".join((method, path, "&".join(canonical_query), "")).encode("utf-8") + body,
         hashlib.sha256).hexdigest()
