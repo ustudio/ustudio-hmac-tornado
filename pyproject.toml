@@ -1,0 +1,24 @@
+[project]
+name = "ustudio-hmac-tornado"
+version = "0.3.0"
+description = "Simple HMAC Client/Server authentication for Tornado"
+authors = [{name = "uStudio Developers", email = "dev@ustudio.com"}]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "tornado (>=6.5.7)"
+]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)"
+]
+
+[tool.poetry]
+requires-poetry = ">=2.4.1"
+packages = [{include = "hmacauth"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
