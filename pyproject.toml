@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "tornado (>=6.5.7)"
+    "tornado (>=6.5.8)"
 ]
 
 [dependency-groups]
